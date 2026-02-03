@@ -19,4 +19,33 @@ A complete web-based management system for borewell drilling services built with
 4. **Reports** - Generate business analytics
 5. **Settings** - Configure system parameters
 
+
 ## 📁 File Structure
+```
+└── 📁borewell-system
+    └── 📁admin
+        ├── dashboard.php
+        ├── manage_customers.php
+        ├── manage_orders.php
+        ├── reports.php
+        ├── settings.php
+    └── 📁assets
+        └── 📁css
+            ├── style.css
+        └── 📁js
+            ├── main.js
+    └── 📁config
+        ├── db.php
+        ├── settings.json
+    └── 📁database
+        ├── schema.sql
+    └── 📁public
+        ├── index.php
+        ├── login.php
+        ├── logout.php
+        ├── order.php
+        ├── profile.php
+        ├── register.php
+        ├── services.php
+    ├── .htaccess
+```
