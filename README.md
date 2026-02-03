@@ -1,4 +1,4 @@
-<img width="1366" height="619" alt="Screenshot from 2026-02-03 17-07-59" src="https://github.com/user-attachments/assets/3c8bdbdb-1582-4d95-a01f-5925175cc461" /># Borewell Management System
+# Borewell Management System
 
 A complete web-based management system for borewell drilling services built with **HTML, CSS, and JavaScript** (no PHP required!).
 
@@ -66,6 +66,7 @@ A complete web-based management system for borewell drilling services built with
 <img width="1366" height="619" alt="Screenshot from 2026-02-03 17-08-33" src="https://github.com/user-attachments/assets/6f0104f2-7527-4e78-a820-3210d318886a" />
 
 ---
+
 
 
 
