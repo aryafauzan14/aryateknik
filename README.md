@@ -49,3 +49,11 @@ A complete web-based management system for borewell drilling services built with
         ├── services.php
     ├── .htaccess
 ```
+
+## 📸 Preview
+<img width="1350" height="616" alt="Screenshot from 2025-11-20 23-18-47" src="https://github.com/user-attachments/assets/d253ae74-16b3-4b51-8a6f-603a8a25b8d8" />
+<img width="1350" height="616" alt="Screenshot from 2025-11-20 23-19-34" src="https://github.com/user-attachments/assets/cd45e46f-d426-4d24-a6fa-cefc9d892589" />
+<img width="1346" height="608" alt="image" src="https://github.com/user-attachments/assets/bb947045-ff54-4c3b-b1ad-60f49568c06f" />
+
+---
+
