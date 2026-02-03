@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Borewell System</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-water"></i>
+                <h1>Borewell<span>System</span></h1>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="login.html"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+                    <li><a href="register.html" class="active"><i class="fas fa-user-plus"></i> Register</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="form-container">
+            <div class="form-header">
+                <h2><i class="fas fa-user-plus"></i> Create Account</h2>
+                <p>Join our borewell service community</p>
+            </div>
+            
+            <div id="registerMessage" class="alert" style="display: none;"></div>
+            
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="regName"><i class="fas fa-user"></i> Full Name</label>
+                    <input type="text" 
+                           id="regName" 
+                           name="regName" 
+                           class="form-control" 
+                           placeholder="Enter your full name"
+                           required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regEmail"><i class="fas fa-envelope"></i> Email Address</label>
+                    <input type="email" 
+                           id="regEmail" 
+                           name="regEmail" 
+                           class="form-control" 
+                           placeholder="Enter your email"
+                           required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regPhone"><i class="fas fa-phone"></i> Phone Number</label>
+                    <input type="tel" 
+                           id="regPhone" 
+                           name="regPhone" 
+                           class="form-control" 
+                           placeholder="Enter your phone number"
+                           required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regUsername"><i class="fas fa-user-circle"></i> Username</label>
+                    <input type="text" 
+                           id="regUsername" 
+                           name="regUsername" 
+                           class="form-control" 
+                           placeholder="Choose a username"
+                           required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regPassword"><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" 
+                           id="regPassword" 
+                           name="regPassword" 
+                           class="form-control" 
+                           placeholder="Enter password (min. 6 characters)"
+                           minlength="6"
+                           required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regConfirmPassword"><i class="fas fa-lock"></i> Confirm Password</label>
+                    <input type="password" 
+                           id="regConfirmPassword" 
+                           name="regConfirmPassword" 
+                           class="form-control" 
+                           placeholder="Confirm your password"
+                           required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-user-plus"></i> Register
+                </button>
+            </form>
+            
+            <div class="form-footer" style="text-align: center; margin-top: 20px;">
+                <p>Already have an account? <a href="login.html">Login here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            const messageDiv = document.getElementById('registerMessage');
+            
+            // Validation
+            if (password !== confirmPassword) {
+                messageDiv.className = 'alert alert-error';
+                messageDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> Passwords do not match!`;
+                messageDiv.style.display = 'block';
+                return;
+            }
+            
+            if (password.length < 6) {
+                messageDiv.className = 'alert alert-error';
+                messageDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> Password must be at least 6 characters!`;
+                messageDiv.style.display = 'block';
+                return;
+            }
+            
+            // Save user to localStorage (demo only)
+            const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+            
+            // Check if username already exists
+            if (users.some(user => user.username === username)) {
+                messageDiv.className = 'alert alert-error';
+                messageDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> Username already exists!`;
+                messageDiv.style.display = 'block';
+                return;
+            }
+            
+            // Add new user
+            const newUser = {
+                id: users.length + 1,
+                name: name,
+                email: email,
+                phone: phone,
+                username: username,
+                password: password, // In real app, this should be hashed
+                role: 'customer',
+                registeredAt: new Date().toISOString()
+            };
+            
+            users.push(newUser);
+            localStorage.setItem('registeredUsers', JSON.stringify(users));
+            
+            // Show success message
+            messageDiv.className = 'alert alert-success';
+            messageDiv.innerHTML = `
+                <i class="fas fa-check-circle"></i> 
+                <strong>Registration successful!</strong><br>
+                You can now login with your credentials.
+            `;
+            messageDiv.style.display = 'block';
+            
+            // Auto-login (optional)
+            setTimeout(() => {
+                // Auto-login the user
+                localStorage.setItem('currentUser', JSON.stringify({
+                    username: username,
+                    name: name,
+                    role: 'customer',
+                    loggedIn: true,
+                    timestamp: new Date().toISOString()
+                }));
+                
+                // Redirect to profile
+                window.location.href = 'profile.html';
+            }, 2000);
+            
+            // Reset form
+            document.getElementById('registerForm').reset();
+        });
+    </script>
+</body>
+</html>

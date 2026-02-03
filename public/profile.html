@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Borewell System</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-water"></i>
+                <h1>Borewell<span>System</span></h1>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="order.html"><i class="fas fa-shopping-cart"></i> Order</a></li>
+                    <li><a href="profile.html" class="active"><i class="fas fa-user"></i> Profile</a></li>
+                    <li><a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Check authentication -->
+        <div id="notLoggedIn" style="display: none;">
+            <div class="alert alert-error" style="margin: 50px 0;">
+                <i class="fas fa-exclamation-triangle"></i> 
+                You must be logged in to view this page. 
+                <a href="login.html">Login here</a>
+            </div>
+        </div>
+
+        <!-- Profile Content -->
+        <div id="profileContent" style="display: none;">
+            <!-- User Info -->
+            <div class="profile-card" style="margin-bottom: 30px;">
+                <div class="profile-header" style="display: flex; align-items: center; gap: 20px; padding: 30px; background: white; border-radius: var(--border-radius); box-shadow: var(--shadow);">
+                    <div class="avatar" style="width: 100px; height: 100px; background: var(--secondary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem;">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="profile-info">
+                        <h2 id="userName"></h2>
+                        <p><i class="fas fa-envelope"></i> <span id="userEmail"></span></p>
+                        <p><i class="fas fa-user-tag"></i> <span id="userRole"></span></p>
+                        <p><i class="fas fa-calendar-alt"></i> Member since: <span id="memberSince"></span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Orders -->
+            <div class="table-container">
+                <h3><i class="fas fa-history"></i> My Orders</h3>
+                <table class="table" id="myOrdersTable">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Service</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Orders will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Quick Actions -->
+            <div style="margin: 30px 0; display: flex; gap: 15px; flex-wrap: wrap;">
+                <a href="order.html" class="btn btn-primary">
+                    <i class="fas fa-plus-circle"></i> Book New Service
+                </a>
+                <button class="btn btn-secondary" onclick="editProfile()">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </button>
+                <button class="btn btn-success" onclick="contactSupport()">
+                    <i class="fas fa-headset"></i> Contact Support
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication and load profile
+        document.addEventListener('DOMContentLoaded', function() {
+            const notLoggedIn = document.getElementById('notLoggedIn');
+            const profileContent = document.getElementById('profileContent');
+            
+            const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            
+            if (userData.loggedIn) {
+                // User is logged in
+                notLoggedIn.style.display = 'none';
+                profileContent.style.display = 'block';
+                
+                // Display user info
+                document.getElementById('userName').textContent = userData.name || userData.username;
+                document.getElementById('userEmail').textContent = userData.email || 'Not provided';
+                document.getElementById('userRole').textContent = userData.role ? userData.role.charAt(0).toUpperCase() + userData.role.slice(1) : 'Customer';
+                document.getElementById('memberSince').textContent = userData.timestamp ? 
+                    new Date(userData.timestamp).toLocaleDateString('id-ID') : 'Recently';
+                
+                // Load user's orders
+                loadUserOrders(userData.username);
+            } else {
+                // User is not logged in
+                notLoggedIn.style.display = 'block';
+                profileContent.style.display = 'none';
+                
+                // Auto-redirect to login
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 3000);
+            }
+        });
+        
+        // Load user's orders
+        function loadUserOrders(username) {
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            const tbody = document.querySelector('#myOrdersTable tbody');
+            tbody.innerHTML = '';
+            
+            // Filter orders for current user (in demo, we'll show all orders)
+            const userOrders = orders.filter(order => 
+                order.customerEmail === username || 
+                order.customerName.toLowerCase().includes(username.toLowerCase())
+            );
+            
+            if (userOrders.length === 0) {
+                // Show all orders for demo purposes
+                orders.forEach(order => {
+                    const row = document.createElement('tr');
+                    const badgeClass = order.status === 'completed' ? 'badge-success' : 
+                                     order.status === 'cancelled' ? 'badge-danger' : 'badge-warning';
+                    
+                    row.innerHTML = `
+                        <td><strong>${order.id}</strong></td>
+                        <td>${order.serviceName || order.serviceType}</td>
+                        <td>${new Date(order.date || order.timestamp).toLocaleDateString('id-ID')}</td>
+                        <td>Rp ${order.price.toLocaleString('id-ID')}</td>
+                        <td>
+                            <span class="badge ${badgeClass}">
+                                ${order.status.replace('_', ' ').toUpperCase()}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" onclick="viewOrderDetails('${order.id}')">
+                                <i class="fas fa-eye"></i> Details
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } else {
+                // Show only user's orders
+                userOrders.forEach(order => {
+                    const row = document.createElement('tr');
+                    const badgeClass = order.status === 'completed' ? 'badge-success' : 
+                                     order.status === 'cancelled' ? 'badge-danger' : 'badge-warning';
+                    
+                    row.innerHTML = `
+                        <td><strong>${order.id}</strong></td>
+                        <td>${order.serviceName || order.serviceType}</td>
+                        <td>${new Date(order.date || order.timestamp).toLocaleDateString('id-ID')}</td>
+                        <td>Rp ${order.price.toLocaleString('id-ID')}</td>
+                        <td>
+                            <span class="badge ${badgeClass}">
+                                ${order.status.replace('_', ' ').toUpperCase()}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" onclick="viewOrderDetails('${order.id}')">
+                                <i class="fas fa-eye"></i> Details
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+        }
+        
+        // Profile functions
+        function editProfile() {
+            alert('Edit profile feature coming soon!\n\nIn a real application, this would open an edit form.');
+        }
+        
+        function contactSupport() {
+            alert('Contacting customer support...\n\nEmail: support@borewellsystem.com\nPhone: +62 21 1234 5678');
+        }
+        
+        function viewOrderDetails(orderId) {
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            const order = orders.find(o => o.id === orderId);
+            
+            if (order) {
+                alert(`Order Details:\n\n` +
+                      `ID: ${order.id}\n` +
+                      `Service: ${order.serviceName || order.serviceType}\n` +
+                      `Date: ${new Date(order.date || order.timestamp).toLocaleDateString('id-ID')}\n` +
+                      `Amount: Rp ${order.price.toLocaleString('id-ID')}\n` +
+                      `Status: ${order.status}\n` +
+                      `Location: ${order.location || 'Not specified'}\n` +
+                      `Notes: ${order.notes || 'None'}`);
+            }
+        }
+        
+        // Logout function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('currentUser');
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html>

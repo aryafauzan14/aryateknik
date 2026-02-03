@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Borewell System</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <header class="main-header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-water"></i>
+                <h1>Borewell<span>System</span></h1>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="index.html"><i class="fmanager-linux-x64.runas fa-home"></i> Home</a></li>
+                    <li><a href="services.html"><i class="fas fa-tools"></i> Services</a></li>
+                    <li><a href="order.html"><i class="fas fa-shopping-cart"></i> Order</a></li>
+                    <li><a href="login.html" class="active"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="login-container">
+        <div class="form-container">
+            <div class="form-header">
+                <h2><i class="fas fa-sign-in-alt"></i> Login</h2>
+                <p>Access your account</p>
+            </div>
+
+            <div id="loginMessage" class="alert" style="display: none;"></div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username"><i class="fas fa-user"></i> Username</label>
+                    <input type="text" id="username" name="username" class="form-control"
+                        placeholder="Enter your username" value="admin" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password"><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="password" name="password" class="form-control"
+                        placeholder="Enter your password" value="admin123" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </form>
+
+            <div class="demo-credentials">
+                <h4>Demo Accounts:</h4>
+                <ul>
+                    <li><strong>Admin:</strong> admin / admin123</li>
+                    <li><strong>User:</strong> user / user123</li>
+                    <li><strong>Customer:</strong> customer / customer123</li>
+                </ul>
+            </div>
+
+            <div class="form-footer" style="text-align: center; margin-top: 20px;">
+                <p>Don't have an account? <a href="register.html">Register here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const messageDiv = document.getElementById('loginMessage');
+
+            // Demo credentials
+            const users = {
+                'admin': { password: 'admin123', role: 'admin', name: 'Administrator' },
+                'user': { password: 'user123', role: 'user', name: 'John Doe' },
+                'customer': { password: 'customer123', role: 'customer', name: 'Jane Smith' }
+            };
+
+            if (users[username] && users[username].password === password) {
+                // Store user data in localStorage
+                localStorage.setItem('currentUser', JSON.stringify({
+                    username: username,
+                    name: users[username].name,
+                    role: users[username].role,
+                    loggedIn: true,
+                    timestamp: new Date().toISOString()
+                }));
+
+                // Show success message
+                messageDiv.className = 'alert alert-success';
+                messageDiv.innerHTML = `<i class="fas fa-check-circle"></i> Login successful! Redirecting...`;
+                messageDiv.style.display = 'block';
+
+                // Redirect based on role
+                setTimeout(() => {
+                    if (users[username].role === 'admin') {
+                        window.location.href = '../admin/dashboard.html';
+                    } else {
+                        window.location.href = 'profile.html';
+                    }
+                }, 1500);
+            } else {
+                // Show error message
+                messageDiv.className = 'alert alert-error';
+                messageDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> Invalid username or password!`;
+                messageDiv.style.display = 'block';
+            }
+        });
+
+        // Auto-fill demo credentials on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const demo = urlParams.get('demo');
+            if (demo === 'admin') {
+                document.getElementById('username').value = 'admin';
+                document.getElementById('password').value = 'admin123';
+            } else if (demo === 'user') {
+                document.getElementById('username').value = 'user';
+                document.getElementById('password').value = 'user123';
+            }
+        });
+    </script>
+</body>
+
+</html>

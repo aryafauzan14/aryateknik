@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Admin Dashboard</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-cog"></i>
+                <h1>System<span>Settings</span></h1>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="settings.html" class="active"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="../public/login.html"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>System Settings</h2>
+        
+        <div id="settingsMessage" class="alert" style="display: none;"></div>
+        
+        <div class="settings-tabs" style="margin: 30px 0;">
+            <div style="display: flex; border-bottom: 2px solid #ddd; flex-wrap: wrap;">
+                <button class="tab-button active" onclick="openTab(event, 'general')">General</button>
+                <button class="tab-button" onclick="openTab(event, 'services')">Services</button>
+                <button class="tab-button" onclick="openTab(event, 'notifications')">Notifications</button>
+                <button class="tab-button" onclick="openTab(event, 'security')">Security</button>
+            </div>
+            
+            <!-- General Settings -->
+            <div id="general" class="tab-content" style="display: block; background: white; padding: 30px; border-radius: 0 0 var(--border-radius) var(--border-radius); margin-top: -2px;">
+                <form id="generalSettingsForm">
+                    <div class="form-group">
+                        <label>Company Name</label>
+                        <input type="text" class="form-control" id="companyName" value="Borewell Solutions">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Company Address</label>
+                        <textarea class="form-control" id="companyAddress" rows="3">Jl. Industri Raya No. 123, Jakarta</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Contact Email</label>
+                        <input type="email" class="form-control" id="contactEmail" value="contact@borewell.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="text" class="form-control" id="contactPhone" value="+62 21 1234 5678">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Website URL</label>
+                        <input type="url" class="form-control" id="websiteUrl" value="https://borewellsystem.com">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Save General Settings</button>
+                </form>
+            </div>
+            
+            <!-- Services Settings -->
+            <div id="services" class="tab-content" style="display: none; background: white; padding: 30px; border-radius: 0 0 var(--border-radius) var(--border-radius); margin-top: -2px;">
+                <h4>Service Settings</h4>
+                <form id="serviceSettingsForm">
+                    <div class="form-group">
+                        <label>Default Service Duration (days)</label>
+                        <input type="number" class="form-control" id="serviceDuration" value="3" min="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Default Warranty Period (months)</label>
+                        <input type="number" class="form-control" id="warrantyPeriod" value="12" min="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Tax Rate (%)</label>
+                        <input type="number" class="form-control" id="taxRate" value="10" step="0.1" min="0" max="100">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Currency</label>
+                        <select class="form-control" id="currency">
+                            <option value="IDR" selected>Indonesian Rupiah (IDR)</option>
+                            <option value="USD">US Dollar (USD)</option>
+                            <option value="EUR">Euro (EUR)</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Save Service Settings</button>
+                </form>
+            </div>
+            
+            <!-- Notifications Settings -->
+            <div id="notifications" class="tab-content" style="display: none; background: white; padding: 30px; border-radius: 0 0 var(--border-radius) var(--border-radius); margin-top: -2px;">
+                <h4>Notification Settings</h4>
+                <form id="notificationSettingsForm">
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <input type="checkbox" id="emailNotifications" checked>
+                            <label for="emailNotifications">Enable Email Notifications</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <input type="checkbox" id="smsNotifications" checked>
+                            <label for="smsNotifications">Enable SMS Notifications</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Notification Email</label>
+                        <input type="email" class="form-control" id="notificationEmail" value="notifications@borewell.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Send Order Confirmation</label>
+                        <select class="form-control" id="orderConfirmation">
+                            <option value="immediate" selected>Immediately</option>
+                            <option value="daily">Daily Summary</option>
+                            <option value="weekly">Weekly Summary</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Save Notification Settings</button>
+                </form>
+            </div>
+            
+            <!-- Security Settings -->
+            <div id="security" class="tab-content" style="display: none; background: white; padding: 30px; border-radius: 0 0 var(--border-radius) var(--border-radius); margin-top: -2px;">
+                <h4>Security Settings</h4>
+                <form id="securitySettingsForm">
+                    <div class="form-group">
+                        <label>Session Timeout (minutes)</label>
+                        <input type="number" class="form-control" id="sessionTimeout" value="30" min="5">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Max Login Attempts</label>
+                        <input type="number" class="form-control" id="maxLoginAttempts" value="5" min="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Password Expiry (days)</label>
+                        <input type="number" class="form-control" id="passwordExpiry" value="90" min="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <input type="checkbox" id="forceSSL" checked>
+                            <label for="forceSSL">Force HTTPS (SSL)</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <input type="checkbox" id="twoFactorAuth">
+                            <label for="twoFactorAuth">Enable Two-Factor Authentication</label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Save Security Settings</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .tab-button {
+            padding: 12px 30px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .tab-button.active {
+            color: var(--secondary-color);
+            border-bottom-color: var(--secondary-color);
+            background: #f8f9fa;
+        }
+        
+        .tab-content {
+            box-shadow: var(--shadow);
+        }
+        
+        .checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .checkbox input[type="checkbox"] {
+            width: auto;
+            transform: scale(1.2);
+        }
+    </style>
+
+    <script>
+        // Tab switching function
+        function openTab(evt, tabName) {
+            // Hide all tab contents
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].style.display = 'none';
+            }
+            
+            // Remove active class from all buttons
+            const tabButtons = document.getElementsByClassName('tab-button');
+            for (let i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].className = tabButtons[i].className.replace(' active', '');
+            }
+            
+            // Show current tab and set button as active
+            document.getElementById(tabName).style.display = 'block';
+            evt.currentTarget.className += ' active';
+        }
+        
+        // Handle form submissions
+        document.getElementById('generalSettingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showMessage('General settings saved successfully!', 'success');
+        });
+        
+        document.getElementById('serviceSettingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showMessage('Service settings saved successfully!', 'success');
+        });
+        
+        document.getElementById('notificationSettingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showMessage('Notification settings saved successfully!', 'success');
+        });
+        
+        document.getElementById('securitySettingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showMessage('Security settings saved successfully!', 'success');
+        });
+        
+        // Show message function
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('settingsMessage');
+            messageDiv.className = `alert alert-${type}`;
+            messageDiv.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${text}`;
+            messageDiv.style.display = 'block';
+            
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Load saved settings from localStorage (demo)
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedSettings = JSON.parse(localStorage.getItem('systemSettings') || '{}');
+            
+            // General settings
+            if (savedSettings.companyName) document.getElementById('companyName').value = savedSettings.companyName;
+            if (savedSettings.companyAddress) document.getElementById('companyAddress').value = savedSettings.companyAddress;
+            
+            // Service settings
+            if (savedSettings.taxRate) document.getElementById('taxRate').value = savedSettings.taxRate;
+            
+            // Save settings on form submit
+            const forms = document.querySelectorAll('.tab-content form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const settings = {
+                        companyName: document.getElementById('companyName').value,
+                        companyAddress: document.getElementById('companyAddress').value,
+                        contactEmail: document.getElementById('contactEmail').value,
+                        contactPhone: document.getElementById('contactPhone').value,
+                        taxRate: document.getElementById('taxRate').value,
+                        lastUpdated: new Date().toISOString()
+                    };
+                    
+                    localStorage.setItem('systemSettings', JSON.stringify(settings));
+                });
+            });
+        });
+    </script>
+</body>
+</html>

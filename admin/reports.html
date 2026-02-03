@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - Admin Dashboard</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-chart-bar"></i>
+                <h1>System<span>Reports</span></h1>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="reports.html" class="active"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                    <li><a href="../public/login.html"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>System Reports & Analytics</h2>
+        
+        <!-- Report Controls -->
+        <div class="report-controls" style="background: white; padding: 20px; border-radius: var(--border-radius); margin: 30px 0;">
+            <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
+                <select class="form-control" style="width: auto;" id="reportPeriod">
+                    <option>Last 7 days</option>
+                    <option selected>Last 30 days</option>
+                    <option>Last 90 days</option>
+                    <option>This year</option>
+                </select>
+                
+                <button class="btn btn-primary" onclick="generateReport()">
+                    <i class="fas fa-filter"></i> Generate Report
+                </button>
+                
+                <button class="btn btn-success" onclick="exportPDF()">
+                    <i class="fas fa-file-pdf"></i> Export PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- Revenue Chart -->
+        <div class="chart-container" style="background: white; padding: 30px; border-radius: var(--border-radius); margin-bottom: 30px;">
+            <h3><i class="fas fa-money-bill-wave"></i> Monthly Revenue</h3>
+            <div id="revenueChart" style="height: 300px; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 5px;">
+                <!-- Chart will be generated here -->
+            </div>
+        </div>
+
+        <!-- Service Distribution -->
+        <div class="chart-container" style="background: white; padding: 30px; border-radius: var(--border-radius); margin-bottom: 30px;">
+            <h3><i class="fas fa-chart-pie"></i> Service Distribution</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 20px;">
+                <div id="serviceDistribution">
+                    <!-- Distribution will be generated here -->
+                </div>
+                
+                <div style="display: flex; flex-direction: column; justify-content: center;">
+                    <div id="pieChart" style="width: 200px; height: 200px; margin: 0 auto;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activities -->
+        <div class="table-container">
+            <h3><i class="fas fa-history"></i> Recent Activities</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Activity</th>
+                        <th>User</th>
+                    </tr>
+                </thead>
+                <tbody id="activityLog">
+                    <!-- Activities will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Demo revenue data
+        const monthlyRevenue = [
+            { month: 'Jan', revenue: 45000000 },
+            { month: 'Feb', revenue: 52000000 },
+            { month: 'Mar', revenue: 48000000 },
+            { month: 'Apr', revenue: 55000000 },
+            { month: 'May', revenue: 60000000 },
+            { month: 'Jun', revenue: 65000000 }
+        ];
+        
+        // Demo service distribution
+        const serviceDistribution = [
+            { service: 'Borewell Drilling', percentage: 45, color: '#3498db' },
+            { service: 'Maintenance', percentage: 25, color: '#2ecc71' },
+            { service: 'Repair', percentage: 15, color: '#e74c3c' },
+            { service: 'Installation', percentage: 10, color: '#f39c12' },
+            { service: 'Water Testing', percentage: 5, color: '#9b59b6' }
+        ];
+        
+        // Demo activities
+        const recentActivities = [
+            { date: '2024-01-15 10:30', activity: 'New order #BW2024-001 placed', user: 'System' },
+            { date: '2024-01-15 11:15', activity: 'Order #BW2024-001 status changed to completed', user: 'Admin' },
+            { date: '2024-01-16 09:45', activity: 'New customer registered: Budi Santoso', user: 'System' },
+            { date: '2024-01-16 14:20', activity: 'Monthly report generated', user: 'Admin' },
+            { date: '2024-01-17 16:00', activity: 'System backup completed', user: 'System' }
+        ];
+        
+        // Generate revenue chart
+        function generateRevenueChart() {
+            const chartDiv = document.getElementById('revenueChart');
+            chartDiv.innerHTML = '';
+            
+            const maxRevenue = Math.max(...monthlyRevenue.map(m => m.revenue));
+            
+            monthlyRevenue.forEach(item => {
+                const barHeight = (item.revenue / maxRevenue) * 100;
+                
+                const barContainer = document.createElement('div');
+                barContainer.style.cssText = 'display: flex; align-items: center; margin-bottom: 15px;';
+                
+                barContainer.innerHTML = `
+                    <div style="width: 50px;">${item.month}</div>
+                    <div style="flex: 1; background: #e8f4fc; height: 30px; border-radius: 3px; position: relative;">
+                        <div style="background: var(--secondary-color); height: 100%; width: ${barHeight}%; border-radius: 3px;"></div>
+                        <span style="position: absolute; right: 10px; top: 5px; font-weight: bold;">
+                            Rp ${(item.revenue / 1000000).toFixed(1)}M
+                        </span>
+                    </div>
+                `;
+                
+                chartDiv.appendChild(barContainer);
+            });
+        }
+        
+        // Generate service distribution
+        function generateServiceDistribution() {
+            const distributionDiv = document.getElementById('serviceDistribution');
+            const pieChartDiv = document.getElementById('pieChart');
+            
+            distributionDiv.innerHTML = '';
+            pieChartDiv.innerHTML = '';
+            
+            // Generate distribution bars
+            serviceDistribution.forEach(item => {
+                const barContainer = document.createElement('div');
+                barContainer.style.cssText = 'margin-bottom: 15px;';
+                
+                barContainer.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span>${item.service}</span>
+                        <span>${item.percentage}%</span>
+                    </div>
+                    <div style="background: #f0f0f0; height: 10px; border-radius: 5px;">
+                        <div style="background: ${item.color}; height: 100%; width: ${item.percentage}%; border-radius: 5px;"></div>
+                    </div>
+                `;
+                
+                distributionDiv.appendChild(barContainer);
+            });
+            
+            // Generate pie chart (simplified version)
+            let pieHTML = '<div style="width: 200px; height: 200px; border-radius: 50%; background: ';
+            
+            // Create conic gradient for pie chart
+            let gradient = '';
+            let accumulated = 0;
+            
+            serviceDistribution.forEach((item, index) => {
+                const start = accumulated;
+                const end = accumulated + item.percentage;
+                gradient += `${item.color} ${start}% ${end}%`;
+                if (index < serviceDistribution.length - 1) gradient += ', ';
+                accumulated = end;
+            });
+            
+            pieChartDiv.innerHTML = `<div style="width: 200px; height: 200px; border-radius: 50%; background: conic-gradient(${gradient});"></div>`;
+        }
+        
+        // Load activity log
+        function loadActivityLog() {
+            const tbody = document.getElementById('activityLog');
+            tbody.innerHTML = '';
+            
+            recentActivities.forEach(activity => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${activity.date}</td>
+                    <td>${activity.activity}</td>
+                    <td>${activity.user}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Generate report
+        function generateReport() {
+            const period = document.getElementById('reportPeriod').value;
+            alert(`Generating report for: ${period}\n\nThis would generate a detailed report in a real application.`);
+            
+            // In a real app, this would fetch data and regenerate charts
+            generateRevenueChart();
+            generateServiceDistribution();
+        }
+        
+        // Export PDF
+        function exportPDF() {
+            alert('Exporting PDF report...\n\nIn a real application, this would generate and download a PDF file.');
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            generateRevenueChart();
+            generateServiceDistribution();
+            loadActivityLog();
+        });
+    </script>
+</body>
+</html>

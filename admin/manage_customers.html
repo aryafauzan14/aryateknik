@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Customers - Admin Dashboard</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-users"></i>
+                <h1>Manage<span>Customers</span></h1>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="manage_customers.html" class="active"><i class="fas fa-users"></i> Customers</a></li>
+                    <li><a href="../public/login.html"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>Customer Management</h2>
+        
+        <!-- Customers Grid -->
+        <div class="customers-grid" id="customersGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px; margin-top: 40px;">
+            <!-- Customers will be loaded here -->
+        </div>
+        
+        <!-- Add Customer Button -->
+        <div style="text-align: center; margin: 40px 0;">
+            <button class="btn btn-primary" onclick="addCustomer()">
+                <i class="fas fa-user-plus"></i> Add New Customer
+            </button>
+        </div>
+    </div>
+
+    <!-- Add Customer Modal -->
+    <div id="customerModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1001; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: white; padding: 30px; border-radius: var(--border-radius); width: 90%; max-width: 500px;">
+            <h3><i class="fas fa-user-plus"></i> Add New Customer</h3>
+            <form id="customerForm">
+                <div class="form-group">
+                    <label>Company/Full Name</label>
+                    <input type="text" class="form-control" id="customerName" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" class="form-control" id="customerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" class="form-control" id="customerPhone" required>
+                </div>
+                <div class="form-group">
+                    <label>Address</label>
+                    <textarea class="form-control" id="customerAddress" rows="3" required></textarea>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary">Save Customer</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeCustomerModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Load customers from localStorage
+        function loadCustomers() {
+            const customers = JSON.parse(localStorage.getItem('customers') || '[]');
+            const grid = document.getElementById('customersGrid');
+            grid.innerHTML = '';
+            
+            customers.forEach(customer => {
+                const card = document.createElement('div');
+                card.className = 'customer-card';
+                card.style.cssText = 'background: white; padding: 25px; border-radius: var(--border-radius); box-shadow: var(--shadow);';
+                
+                card.innerHTML = `
+                    <div class="customer-header" style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                        <div class="customer-avatar" style="width: 60px; height: 60px; background: var(--secondary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                            ${customer.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                            <h3>${customer.name}</h3>
+                            <p style="color: #666;">Customer ID: #${String(customer.id).padStart(4, '0')}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="customer-info">
+                        <p><i class="fas fa-envelope"></i> ${customer.email}</p>
+                        <p><i class="fas fa-phone"></i> ${customer.phone}</p>
+                        <p><i class="fas fa-map-marker-alt"></i> ${customer.address}</p>
+                        <p><i class="fas fa-calendar"></i> Member since: ${customer.join_date}</p>
+                    </div>
+                    
+                    <div class="customer-stats" style="display: flex; justify-content: space-between; margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+                        <div style="text-align: center;">
+                            <h4 style="color: var(--secondary-color);">${customer.total_orders || 0}</h4>
+                            <p style="font-size: 0.9rem;">Orders</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <h4 style="color: var(--success-color);">Rp ${(customer.total_spent || 0).toLocaleString('id-ID')}</h4>
+                            <p style="font-size: 0.9rem;">Total Spent</p>
+                        </div>
+                    </div>
+                    
+                    <div class="customer-actions" style="display: flex; gap: 10px;">
+                        <button class="btn btn-primary btn-sm" onclick="viewCustomer(${customer.id})">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="editCustomer(${customer.id})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-success btn-sm" onclick="contactCustomer(${customer.id})">
+                            <i class="fas fa-comment"></i> Contact
+                        </button>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+        
+        // Customer actions
+        function viewCustomer(id) {
+            const customers = JSON.parse(localStorage.getItem('customers') || '[]');
+            const customer = customers.find(c => c.id === id);
+            
+            if (customer) {
+                alert(`Customer Details:\n\n` +
+                      `ID: #${String(customer.id).padStart(4, '0')}\n` +
+                      `Name: ${customer.name}\n` +
+                      `Email: ${customer.email}\n` +
+                      `Phone: ${customer.phone}\n` +
+                      `Address: ${customer.address}\n` +
+                      `Join Date: ${customer.join_date}\n` +
+                      `Total Orders: ${customer.total_orders || 0}\n` +
+                      `Total Spent: Rp ${(customer.total_spent || 0).toLocaleString('id-ID')}`);
+            }
+        }
+        
+        function editCustomer(id) {
+            const customers = JSON.parse(localStorage.getItem('customers') || '[]');
+            const customer = customers.find(c => c.id === id);
+            
+            if (customer) {
+                const newName = prompt('Edit customer name:', customer.name);
+                if (newName) {
+                    customer.name = newName;
+                    localStorage.setItem('customers', JSON.stringify(customers));
+                    loadCustomers();
+                    alert('Customer updated!');
+                }
+            }
+        }
+        
+        function contactCustomer(id) {
+            const customers = JSON.parse(localStorage.getItem('customers') || '[]');
+            const customer = customers.find(c => c.id === id);
+            
+            if (customer) {
+                const message = prompt('Enter message to send to customer:');
+                if (message) {
+                    alert(`Message sent to ${customer.name}!\n\n` +
+                          `Email: ${customer.email}\n` +
+                          `Phone: ${customer.phone}\n` +
+                          `Message: ${message}`);
+                }
+            }
+        }
+        
+        // Modal functions
+        function addCustomer() {
+            document.getElementById('customerModal').style.display = 'flex';
+        }
+        
+        function closeCustomerModal() {
+            document.getElementById('customerModal').style.display = 'none';
+            document.getElementById('customerForm').reset();
+        }
+        
+        // Handle new customer form
+        document.getElementById('customerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const customers = JSON.parse(localStorage.getItem('customers') || '[]');
+            const newId = customers.length > 0 ? Math.max(...customers.map(c => c.id)) + 1 : 1;
+            
+            const newCustomer = {
+                id: newId,
+                name: document.getElementById('customerName').value,
+                email: document.getElementById('customerEmail').value,
+                phone: document.getElementById('customerPhone').value,
+                address: document.getElementById('customerAddress').value,
+                join_date: new Date().toISOString().split('T')[0],
+                total_orders: 0,
+                total_spent: 0
+            };
+            
+            customers.push(newCustomer);
+            localStorage.setItem('customers', JSON.stringify(customers));
+            
+            closeCustomerModal();
+            loadCustomers();
+            alert('Customer added successfully!');
+        });
+        
+        // Load customers on page load
+        document.addEventListener('DOMContentLoaded', loadCustomers);
+        
+        // Close modal when clicking outside
+        document.getElementById('customerModal').addEventListener('click', function(e) {
+            if (e.target === this) closeCustomerModal();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Service - Borewell System</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-water"></i>
+                <h1>Borewell<span>System</span></h1>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="services.html"><i class="fas fa-tools"></i> Services</a></li>
+                    <li><a href="order.html" class="active"><i class="fas fa-shopping-cart"></i> Order</a></li>
+                    <li><a href="login.html"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="form-container">
+            <div class="form-header">
+                <h2><i class="fas fa-calendar-check"></i> Book a Service</h2>
+                <p>Fill in the details below to schedule your service</p>
+            </div>
+            
+            <div id="orderMessage" class="alert" style="display: none;"></div>
+            
+            <form id="orderForm">
+                <div class="form-group">
+                    <label for="customerName"><i class="fas fa-user"></i> Full Name</label>
+                    <input type="text" 
+                           id="customerName" 
+                           name="customerName" 
+                           class="form-control" 
+                           placeholder="Enter your full name"
+                           required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="customerEmail"><i class="fas fa-envelope"></i> Email Address</label>
+                    <input type="email" 
+                           id="customerEmail" 
+                           name="customerEmail" 
+                           class="form-control" 
+                           placeholder="Enter your email"
+                           required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="customerPhone"><i class="fas fa-phone"></i> Phone Number</label>
+                    <input type="tel" 
+                           id="customerPhone" 
+                           name="customerPhone" 
+                           class="form-control" 
+                           placeholder="Enter your phone number"
+                           required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="serviceType"><i class="fas fa-concierge-bell"></i> Select Service</label>
+                    <select id="serviceType" name="serviceType" class="form-control" required>
+                        <option value="">-- Choose a Service --</option>
+                        <option value="drilling">Borewell Drilling - Rp 5,000,000</option>
+                        <option value="maintenance">Maintenance - Rp 1,500,000</option>
+                        <option value="repair">Emergency Repair - Rp 2,000,000</option>
+                        <option value="installation">Pump Installation - Rp 3,000,000</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="location"><i class="fas fa-map-marker-alt"></i> Service Location</label>
+                    <textarea id="location" 
+                              name="location" 
+                              class="form-control" 
+                              rows="3" 
+                              placeholder="Enter complete address including landmarks"
+                              required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="date"><i class="fas fa-calendar-alt"></i> Preferred Date</label>
+                    <input type="date" 
+                           id="date" 
+                           name="date" 
+                           class="form-control" 
+                           min="2024-01-01"
+                           required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="notes"><i class="fas fa-sticky-note"></i> Additional Notes</label>
+                    <textarea id="notes" 
+                              name="notes" 
+                              class="form-control" 
+                              rows="3" 
+                              placeholder="Any special requirements or instructions"></textarea>
+                </div>
+                
+                <div class="price-summary" style="margin: 20px 0; padding: 15px; background: #e8f4fc; border-radius: 5px;">
+                    <h4>Price Summary:</h4>
+                    <p>Service Fee: <span id="priceDisplay">Rp 0</span></p>
+                    <p>Tax (10%): <span id="taxDisplay">Rp 0</span></p>
+                    <p><strong>Total: <span id="totalDisplay">Rp 0</span></strong></p>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-check"></i> Confirm Booking
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Service prices
+        const servicePrices = {
+            'drilling': 5000000,
+            'maintenance': 1500000,
+            'repair': 2000000,
+            'installation': 3000000
+        };
+        
+        // Update price when service changes
+        document.getElementById('serviceType').addEventListener('change', function() {
+            updatePrice();
+        });
+        
+        function updatePrice() {
+            const serviceType = document.getElementById('serviceType').value;
+            const price = servicePrices[serviceType] || 0;
+            const tax = price * 0.1;
+            const total = price + tax;
+            
+            document.getElementById('priceDisplay').textContent = formatCurrency(price);
+            document.getElementById('taxDisplay').textContent = formatCurrency(tax);
+            document.getElementById('totalDisplay').textContent = formatCurrency(total);
+        }
+        
+        function formatCurrency(amount) {
+            return 'Rp ' + amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+        
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('date').min = today;
+        
+        // Handle form submission
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Generate order ID
+            const orderId = 'BW' + new Date().getFullYear() + 
+                           String(new Date().getMonth() + 1).padStart(2, '0') + 
+                           String(new Date().getDate()).padStart(2, '0') + 
+                           Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            
+            // Get form data
+            const orderData = {
+                id: orderId,
+                customerName: document.getElementById('customerName').value,
+                customerEmail: document.getElementById('customerEmail').value,
+                customerPhone: document.getElementById('customerPhone').value,
+                serviceType: document.getElementById('serviceType').value,
+                serviceName: document.getElementById('serviceType').options[document.getElementById('serviceType').selectedIndex].text,
+                location: document.getElementById('location').value,
+                date: document.getElementById('date').value,
+                notes: document.getElementById('notes').value,
+                price: servicePrices[document.getElementById('serviceType').value] || 0,
+                status: 'pending',
+                timestamp: new Date().toISOString()
+            };
+            
+            // Save to localStorage
+            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            orders.push(orderData);
+            localStorage.setItem('orders', JSON.stringify(orders));
+            
+            // Show success message
+            const messageDiv = document.getElementById('orderMessage');
+            messageDiv.className = 'alert alert-success';
+            messageDiv.innerHTML = `
+                <i class="fas fa-check-circle"></i> 
+                <strong>Order placed successfully!</strong><br>
+                Your Order ID is: <strong>${orderId}</strong><br>
+                We will contact you soon to confirm the schedule.
+            `;
+            messageDiv.style.display = 'block';
+            
+            // Reset form
+            document.getElementById('orderForm').reset();
+            updatePrice();
+            
+            // Scroll to message
+            messageDiv.scrollIntoView({ behavior: 'smooth' });
+        });
+        
+        // Initialize price display
+        updatePrice();
+    </script>
+</body>
+</html>
